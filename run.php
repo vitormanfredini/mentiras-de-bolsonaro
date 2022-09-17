@@ -5,7 +5,10 @@ $emojiMentiu = '🤥';
 $emojiOk = '✅';
 $colunas = 10;
 
-define('DEBUG',1);
+//1 para explicitar tudo que está fazendo durante o crawler
+//0 para não mostrar nada
+define('DEBUG',0);
+
 include('functions.php');
 
 //checa se tem diretórios necessários
@@ -18,54 +21,54 @@ if(!isWritable('./cache')){
 	die();
 }
 
-//CRAWLER PART
-//CRAWLER PART
-//CRAWLER PART
-
+//coisas relacionadas ao crawler
 $host = 'www.aosfatos.org';
 $page = 1;
 $strPagePlaceholder = '||PAGE||';
-
 $urlStart = 'https://www.aosfatos.org/todas-as-declara%C3%A7%C3%B5es-de-bolsonaro/';
 $urlSearchBase = 'https://www.aosfatos.org/todas-as-declara%C3%A7%C3%B5es-de-bolsonaro/?page=||PAGE||';
-
-$contents1 = get_web_page($urlStart,$host);
-
 $countPageResults = 0;
 $countCacheInvalidado = 0;
-
 $arrOutput = array();
 
-$countMatches = 0;
+//Baixando dados
+echo 'Baixando dados. Isso vai demorar alguns minutos...'."\n";
 
+//pega página inicial para pegar cookies, etc
+$contents1 = get_web_page($urlStart,$host);
+
+//busca páginas até não encontrar mais fatos
 while(true){
 
-	//get search results
+	//pega página de resultado
 	$urlSearch = str_replace('||PAGE||',$page,$urlSearchBase);
 	$contents2 = get_web_page($urlSearch,$host,$contents1['cookies'],$urlStart);
+	//se não usou cache, espera um pouco para não sobrecarregar servidor
 	if($contents2['cache'] == false){
 		sleep(rand(1,3));
 	}
 	$countPageResults++;
 
+	//cria array com html (ainda sujo) de cada fato
 	$conteudo = $contents2['content'];
 	$arrFactsParts = explode('<p class="w600">',$conteudo);
 	if(isset($arrFactsParts[0])){
 		unset($arrFactsParts[0]);
 	}
 
+	//para cada html de fato
 	foreach($arrFactsParts as $strFactsPart){
 		try {
 			$arrItem = array();
 
-			//titulo
+			//extrai titulo
 			$arrParts = explodeByArray(array('<h4>','</h4>'),$strFactsPart);
 			if(!isset($arrParts[1])){
 				throw new Exception('Nao encontrou titulo.');
 			}
 			$arrItem['title'] = trim(strip_tags($arrParts[1]));
 
-			//texto corrido
+			//extrai texto corrido
 			// $arrParts = explodeByArray(array('neuton fs20 w300">','</p>'),$strFactsPart);
 			// if(!isset($arrParts[1])){
 			// 	throw new Exception('Nao encontrou texto corrido.');
@@ -86,7 +89,7 @@ while(true){
 
 		} catch (Exception $e){
 
-			//trata erros
+			//trata possíveis erros
 			echo 'Erro: '.$e->getMessage()."\n";
 
 			if(false !== strstr($contents2['content'], '<p>Please try again in a few minutes.</p>')){
@@ -118,8 +121,9 @@ while(true){
 		}
 	}
 
+	//se não achou, acaba aqui
 	if(count($arrFactsParts) == 0){
-		echo 'Não encontrou mais facts. Para o crawler.'."\n";
+		echo 'Não há mais facts para processar. Para o crawler.'."\n";
 		break;
 	}
 
@@ -128,7 +132,9 @@ while(true){
 
 echo 'Páginas processadas: '.$countPageResults."\n";
 
+//caso tenha invalidado algum cache (as vezes uma página de erro do servidor, algo assim...)
 if($countCacheInvalidado > 0){
+	//precisa rodar de novo
 	echo $countCacheInvalidado.' arquivos de cache foram invalidados.'."\n".'Rode novamente o script.'."\n";
 	die();
 }
@@ -136,12 +142,12 @@ echo "\n";
 echo '---------------------------------------';
 echo "\n";
 
-//OUTPUT PART
-//OUTPUT PART
-//OUTPUT PART
+//saída dos emojis
 
+//deixa em ordem cronológica crescente (do mais antigo para o mais recente)
 $arrOutput = array_reverse($arrOutput);
 
+//guarda menor e maior timestamps
 $menor = 999999999999999999;
 $maior = 0;
 foreach($arrOutput as $arrItem){
@@ -153,6 +159,7 @@ foreach($arrOutput as $arrItem){
     }
 }
 
+//popula um array de dias, somando 1 para cada mentira
 $umDiaEmSegundos = 24 * 60 * 60;
 $maiorDia = 0;
 $arrDias = array();
@@ -171,34 +178,26 @@ foreach($arrOutput as $arrItem){
     }
 }
 
+//completa o array com zero para os dias em que não teve mentira
 for($c=0;$c<$maiorDia;$c++){
     if(false === isset($arrDias[$c])){
         $arrDias[$c] = 0;
     }
 }
-
+//acerta os índices
 ksort($arrDias);
 
+//output inicial
+echo "\n";
+echo "De:  ".date('d/m/Y',$menor)."\n";
+echo "Até: ".date('d/m/Y',$maior)."\n";
+echo "\n";
+echo 'Dia em que Bolsonaro mentiu: '.$emojiMentiu."\n";
+echo 'Dia em que não mentiu: '.$emojiOk."\n";
 echo "\n";
 
-echo "De:  ".date('d/m/Y',$menor);
-echo "\n";
-echo "Até: ".date('d/m/Y',$maior);
-
-echo "\n";
-echo "\n";
-
-echo 'Dia em que Bolsonaro mentiu: '.$emojiMentiu;
-echo "\n";
-echo 'Dia em que não mentiu: '.$emojiOk;
-
-echo "\n";
-echo "\n";
-
+//output dos emojis
 foreach($arrDias as $index => $quantas){
-    // $porc = $quantas / $max;
-    // $qualChar = ceil($porc * (strlen($strChars)-1));
-    // echo substr($strChars,$qualChar,1);
     if($quantas == 0){
         echo $emojiOk;
     }else{
@@ -209,9 +208,9 @@ foreach($arrDias as $index => $quantas){
     }
 }
 
+//output da fonte
 echo "\n";
 echo "\n";
-
 echo 'Dados: https://www.aosfatos.org/todas-as-declara%C3%A7%C3%B5es-de-bolsonaro/';
 echo "\n";
 echo "\n";
