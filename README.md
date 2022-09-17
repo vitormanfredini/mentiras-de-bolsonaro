@@ -1,5 +1,5 @@
 
-# Mentiras de Bolsonaro
+# Mentiras de Bolsonaro 🤥
 
 Um crawler do site [aosfatos.org](https://www.aosfatos.org/) e um visualizador que usa emojis para os dias em que o presidente mentiu ou distorceu informações publicamente.
 
