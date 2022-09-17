@@ -7,6 +7,19 @@ Para rodar, basta executar `php run.php` de dentro da pasta do repositório.
 
 ---
 
+Para configurar outros emojis ou mudar o número de colunas, edite as primeiras linhas do arquivo `run.php`:
+
+```
+<?php
+
+//configurações
+$emojiMentiu = '🤥';
+$emojiOk = '✅';
+$colunas = 10;
+```
+
+---
+
 Aqui está um exemplo de saída (executado no dia 15/09/2022):
 
 ```
