@@ -159,23 +159,19 @@ foreach($arrOutput as $arrItem){
     }
 }
 
-//popula um array de dias, somando 1 para cada mentira
+//popula um array de dias com contagem de quantas mentiras naquele dia
 $umDiaEmSegundos = 24 * 60 * 60;
 $maiorDia = 0;
 $arrDias = array();
-$max = 0;
 foreach($arrOutput as $arrItem){
-    $dia = floor(($arrItem['timestamp'] - $menor) / $umDiaEmSegundos);
-    if($dia > $maiorDia){
-        $maiorDia = $dia;
+    $diaIndex = floor(($arrItem['timestamp'] - $menor) / $umDiaEmSegundos);
+    if($diaIndex > $maiorDia){
+        $maiorDia = $diaIndex;
     }
-    if(!isset($arrDias[$dia])){
-		$arrDias[$dia] = 0;
+    if(!isset($arrDias[$diaIndex])){
+		$arrDias[$diaIndex] = 0;
     }
-	$arrDias[$dia]++;
-    if($arrDias[$dia] > $max){
-        $max = $arrDias[$dia];
-    }
+	$arrDias[$diaIndex]++;
 }
 
 //completa o array com zero para os dias em que não teve mentira
@@ -187,14 +183,23 @@ for($c=0;$c<$maiorDia;$c++){
 //acerta os índices
 ksort($arrDias);
 
+//total de mentiras
+$mentirasTotal = 0;
+foreach($arrDias as $count){
+	$mentirasTotal += $count;
+}
+
 //output inicial
 echo "\n";
 echo "De:  ".date('d/m/Y',$menor)."\n";
 echo "Até: ".date('d/m/Y',$maior)."\n";
 echo "\n";
-echo 'Dia em que Bolsonaro mentiu: '.$emojiMentiu."\n";
-echo 'Dia em que não mentiu: '.$emojiOk."\n";
+echo $mentirasTotal." mentiras ou distorções.";
 echo "\n";
+echo "\n";
+echo "legenda:\n";
+echo 'Bolsonaro mentiu: '.$emojiMentiu."\n";
+echo 'não mentiu: '.$emojiOk."\n";
 
 //output dos emojis
 foreach($arrDias as $index => $quantas){
