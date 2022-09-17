@@ -16,10 +16,11 @@ if(!is_dir('./cache')){
 	mkdir("./cache", 0777);
 }
 
-if(!isWritable('./cache')){
-	echo 'Pasta ./cache nao tem permissao de escrita.'."\n";
-	die();
-}
+//tem permissão de escrita?
+// if(!isWritable('./cache')){
+// 	echo 'Pasta ./cache nao tem permissao de escrita.'."\n";
+// 	die();
+// }
 
 //coisas relacionadas ao crawler
 $host = 'www.aosfatos.org';
