@@ -3,7 +3,6 @@
 //configurações
 $emojiMentiu = '🤥';
 $emojiOk = '🟢';
-$colunas = 7;
 
 //1 para explicitar tudo que está fazendo durante o crawler
 //0 para não mostrar nada
@@ -164,6 +163,7 @@ echo 'Dias em que Bolsonaro mentiu ou distorceu informação publicamente: '.$em
 echo 'Dias em que não fez isto: '.$emojiOk."\n\n";
 
 //output dos emojis
+$colunas = 7;
 $numeroDiaDaSemanaQueComeca = intval(date('N', $menor));
 
 for($c=0;$c<$numeroDiaDaSemanaQueComeca;$c++){
