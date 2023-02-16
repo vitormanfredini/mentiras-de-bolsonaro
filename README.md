@@ -1,7 +1,7 @@
 
 # Mentiras de Bolsonaro 🤥
 
-Um crawler do site [aosfatos.org](https://www.aosfatos.org/) e um visualizador que usa emojis para mostrar os dias em que o presidente mentiu ou distorceu informações publicamente.
+Um crawler do site [aosfatos.org](https://www.aosfatos.org/) e um visualizador que usa emojis para mostrar os dias em que o ex-presidente mentiu ou distorceu informações publicamente.
 
 Para rodar, basta executar `php run.php` de dentro da pasta do repositório.
 
